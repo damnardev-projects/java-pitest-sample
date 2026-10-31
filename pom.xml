@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xmlns="http://maven.apache.org/POM/4.0.0"
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>fr.damnardev.template.maven</groupId>
+	<artifactId>maven-template-wrapper</artifactId>
+	<version>1.0.0-SNAPSHOT</version>
+	<packaging>pom</packaging>
+
+	<name>Maven Template Wrapper</name>
+
+	<licenses>
+		<license>
+			<name>MIT</name>
+			<url>https://opensource.org/licenses/MIT</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+
+	<developers>
+		<developer>
+			<id>damnardev</id>
+			<name>Damien</name>
+			<email>admin@damnardev.fr</email>
+		</developer>
+	</developers>
+
+	<scm>
+		<url>https://github.com/damnardev-projects/maven-template</url>
+		<connection>scm:git:git://github.com/damnardev-projects/maven-template.git</connection>
+		<developerConnection>scm:git:git@github.com:damnardev-projects/maven-template.git</developerConnection>
+		<tag>HEAD</tag>
+	</scm>
+
+	<properties>
+		<jacoco.maven.plugin.version>0.8.16</jacoco.maven.plugin.version>
+		<maven.enforcer.plugin.version>3.7.0</maven.enforcer.plugin.version>
+		<sonar.maven.plugin.version>5.8.0.7211</sonar.maven.plugin.version>
+		<versions.maven.plugin.version>2.23.0</versions.maven.plugin.version>
+
+		<sonar.projectKey>maven-template</sonar.projectKey>
+		<sonar.projectName>Maven Template</sonar.projectName>
+		<sonar.coverage.jacoco.xmlReportPaths>
+			${maven.multiModuleProjectDirectory}/maven-template-tests/target/site/jacoco-aggregate/jacoco.xml
+		</sonar.coverage.jacoco.xmlReportPaths>
+		<sonar.coverage.exclusions>**/Startup.java</sonar.coverage.exclusions>
+		<jacoco.excludes>**/generated/**,**/target/**</jacoco.excludes>
+	</properties>
+
+	<modules>
+		<module>maven-template-dependencies</module>
+		<module>maven-template-parent</module>
+		<module>maven-template-internal-parent</module>
+		<module>maven-template-common</module>
+		<module>maven-template-cli</module>
+		<module>maven-template-tests</module>
+	</modules>
+
+	<build>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.jacoco</groupId>
+					<artifactId>jacoco-maven-plugin</artifactId>
+					<version>${jacoco.maven.plugin.version}</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-enforcer-plugin</artifactId>
+					<version>${maven.enforcer.plugin.version}</version>
+				</plugin>
+				<plugin>
+					<groupId>org.sonarsource.scanner.maven</groupId>
+					<artifactId>sonar-maven-plugin</artifactId>
+					<version>${sonar.maven.plugin.version}</version>
+				</plugin>
+				<plugin>
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>versions-maven-plugin</artifactId>
+					<version>${versions.maven.plugin.version}</version>
+					<configuration>
+						<ignoredVersions>.*[-.]M\d+,.*-SNAPSHOT,.*[-.]alpha.*,.*[-.]beta.*</ignoredVersions>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+		<plugins>
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>prepare-agent</id>
+						<goals>
+							<goal>prepare-agent</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-enforcer-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>enforce-maven</id>
+						<goals>
+							<goal>enforce</goal>
+						</goals>
+						<configuration>
+							<rules>
+								<requireMavenVersion>
+									<version>[3.9,)</version>
+								</requireMavenVersion>
+							</rules>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.sonarsource.scanner.maven</groupId>
+				<artifactId>sonar-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>
