@@ -4,12 +4,12 @@
 		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>fr.damnardev.template.maven</groupId>
-	<artifactId>maven-template-wrapper</artifactId>
+	<groupId>fr.damnardev.sample.pitest</groupId>
+	<artifactId>pitest-sample-wrapper</artifactId>
 	<version>1.0.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
-	<name>Maven Template Wrapper</name>
+	<name>Pitest Sample Wrapper</name>
 
 	<licenses>
 		<license>
@@ -28,34 +28,36 @@
 	</developers>
 
 	<scm>
-		<url>https://github.com/damnardev-projects/maven-template</url>
-		<connection>scm:git:git://github.com/damnardev-projects/maven-template.git</connection>
-		<developerConnection>scm:git:git@github.com:damnardev-projects/maven-template.git</developerConnection>
+		<url>https://github.com/damnardev-projects/java-pitest-sample</url>
+		<connection>scm:git:git://github.com/damnardev-projects/java-pitest-sample.git</connection>
+		<developerConnection>scm:git:git@github.com:damnardev-projects/java-pitest-sample.git</developerConnection>
 		<tag>HEAD</tag>
 	</scm>
 
 	<properties>
 		<jacoco.maven.plugin.version>0.8.16</jacoco.maven.plugin.version>
 		<maven.enforcer.plugin.version>3.7.0</maven.enforcer.plugin.version>
+		<pitest.maven.plugin.version>1.30.0</pitest.maven.plugin.version>
+		<pitest.junit5.version>1.2.3</pitest.junit5.version>
 		<sonar.maven.plugin.version>5.8.0.7211</sonar.maven.plugin.version>
 		<versions.maven.plugin.version>2.23.0</versions.maven.plugin.version>
 
-		<sonar.projectKey>maven-template</sonar.projectKey>
-		<sonar.projectName>Maven Template</sonar.projectName>
+		<sonar.projectKey>pitest-sample</sonar.projectKey>
+		<sonar.projectName>Pitest Sample</sonar.projectName>
 		<sonar.coverage.jacoco.xmlReportPaths>
-			${maven.multiModuleProjectDirectory}/maven-template-tests/target/site/jacoco-aggregate/jacoco.xml
+			${maven.multiModuleProjectDirectory}/pitest-sample-tests/target/site/jacoco-aggregate/jacoco.xml
 		</sonar.coverage.jacoco.xmlReportPaths>
 		<sonar.coverage.exclusions>**/Startup.java</sonar.coverage.exclusions>
 		<jacoco.excludes>**/generated/**,**/target/**</jacoco.excludes>
 	</properties>
 
 	<modules>
-		<module>maven-template-dependencies</module>
-		<module>maven-template-parent</module>
-		<module>maven-template-internal-parent</module>
-		<module>maven-template-common</module>
-		<module>maven-template-cli</module>
-		<module>maven-template-tests</module>
+		<module>pitest-sample-dependencies</module>
+		<module>pitest-sample-parent</module>
+		<module>pitest-sample-internal-parent</module>
+		<module>pitest-sample-common</module>
+		<module>pitest-sample-cli</module>
+		<module>pitest-sample-tests</module>
 	</modules>
 
 	<build>
@@ -83,6 +85,18 @@
 					<configuration>
 						<ignoredVersions>.*[-.]M\d+,.*-SNAPSHOT,.*[-.]alpha.*,.*[-.]beta.*</ignoredVersions>
 					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.pitest</groupId>
+					<artifactId>pitest-maven</artifactId>
+					<version>${pitest.maven.plugin.version}</version>
+					<dependencies>
+						<dependency>
+							<groupId>org.pitest</groupId>
+							<artifactId>pitest-junit5-plugin</artifactId>
+							<version>${pitest.junit5.version}</version>
+						</dependency>
+					</dependencies>
 				</plugin>
 			</plugins>
 		</pluginManagement>
@@ -121,6 +135,33 @@
 			<plugin>
 				<groupId>org.sonarsource.scanner.maven</groupId>
 				<artifactId>sonar-maven-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.pitest</groupId>
+				<artifactId>pitest-maven</artifactId>
+				<executions>
+					<execution>
+						<id>run-mutation-tests</id>
+						<goals>
+							<goal>mutationCoverage</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<targetClasses>
+						<param>fr.damnardev.sample.pitest.*</param>
+					</targetClasses>
+					<targetTests>
+						<param>fr.damnardev.sample.pitest.*</param>
+					</targetTests>
+					<mutators>
+						<mutator>ALL</mutator>
+					</mutators>
+					<exportLineCoverage>true</exportLineCoverage>
+					<outputFormats>
+						<value>XML</value>
+					</outputFormats>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>
