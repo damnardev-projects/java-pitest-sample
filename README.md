@@ -1,22 +1,24 @@
-# Maven Template
+# Pitest Sample
 
-Ce projet Java peut servir de modèle pour un nouveau projet. Il utilise **Maven** pour gérer le cycle de vie du projet, les dépendances.
+L'objectif de ce projet est de servir d'exemple sur la mise en place de pitest dans un projet. Pitest est un outil de tests de mutation pour Java, c'est-à-dire qu'il va modifier une portion de code et vérifier qu'au moins un test échoue.
+
+Si les tests n'échouent pas après la modification du code, cela signifie que le test n'est pas suffisamment robuste pour détecter cette modification.
 
 ## Structure du projet
 
 Ci-dessous, vous trouverez la structure des répertoires du projet :
 
-Le fichier **root/pom.xml** liste les modules, configure **SonarQube** et **JaCoCo**.
+Le fichier **root/pom.xml** liste les modules, configure **SonarQube**, **JaCoCo** et **Pitest**.
 
-Le module **maven-template-dependencies** centralise les versions des dépendances et des plugins.
+Le module **pitest-sample-dependencies** centralise les versions des dépendances et des plugins.
 
-Le module **maven-template-parent** configure la version de **Java** et l'encodage, et hérite de **maven-template-dependencies**.
+Le module **pitest-sample-parent** configure la version de **Java** et l'encodage, et hérite de **pitest-sample-dependencies**.
 
-Le module **maven-template-internal-parent** est un module utilitaire qui sert de parent pour les modules internes. Il hérite de **maven-template-parent** et configure **flatten-maven-plugin** en mode **OSSRH**.
+Le module **pitest-sample-internal-parent** est un module utilitaire qui sert de parent pour les modules internes. Il hérite de **pitest-sample-parent** et configure **flatten-maven-plugin** en mode **OSSRH**.
 
-Les modules **maven-template-common** et **maven-template-cli** sont des exemples du template. Ils héritent tous deux de **maven-template-internal-parent**.
+Les modules **pitest-sample-common** et **pitest-sample-cli** sont des exemples du projet. Ils héritent tous deux de **pitest-sample-internal-parent**.
 
-Le module **maven-template-tests** sert à agréger les résultats des tests et de couverture.
+Le module **pitest-sample-tests** sert à agréger les résultats des tests, de couverture et de mutation.
 
 ## Installation
 
@@ -27,28 +29,56 @@ Une fois le projet cloné, exécutez la commande `./mvnw clean verify` pour tél
 - `./mvnw clean` : supprime les fichiers générés
 - `./mvnw compile` : compile le projet
 - `./mvnw test` : exécute les tests unitaires
-- `./mvnw verify` : exécute les tests et génère un rapport de couverture dans **maven-template-tests/target/site/jacoco-aggregate**
+- `./mvnw verify` : exécute les tests, génère un rapport de couverture dans **pitest-sample-tests/target/site/jacoco-aggregate** et un rapport de mutation dans **pitest-sample-tests/target/pit-reports**
 - `./mvnw install` : installe le projet dans le dépôt local **Maven**
-- `./mvnw exec:java -pl maven-template-cli` : exécute l'application en ligne de commande
+- `./mvnw exec:java -pl pitest-sample-cli` : exécute l'application en ligne de commande
 - `./mvnw versions:display-dependency-updates` : liste les mises à jour disponibles des dépendances
 - `./mvnw versions:display-plugin-updates` : liste les mises à jour disponibles des plugins
 
-## Ajouter une dépendance
+## Tests de mutation (PIT)
 
-Vous devez éditer la section **dependencyManagement** du **maven-template-dependencies/pom.xml** pour déclarer la nouvelle dépendance.
+Le projet utilise [PIT](https://pitest.org/) pour mesurer la qualité des tests par mutation. Les plugins **pitest-maven** et **pitest-junit5-plugin** sont configurés dans le **pom.xml** racine : leurs versions sont définies par les propriétés `pitest.maven.plugin.version` et `pitest.junit5.version`, et l'exécution `mutationCoverage` s'applique à tous les modules, dont **pitest-sample-common**.
 
-Pour ajouter un plugin, vous devez éditer la section **pluginManagement** du **maven-template-dependencies/pom.xml** pour déclarer le plugin.
+L'exécution `mutationCoverage` (id `run-mutation-tests`) est déclarée dans le `pom.xml` racine. Pour adapter la configuration d'un module, redéclarez le plugin dans le `pom.xml` de ce module avec les valeurs souhaitées :
 
-## Ajouter un module
+```xml
+<build>
+	<plugins>
+		<plugin>
+			<groupId>org.pitest</groupId>
+			<artifactId>pitest-maven</artifactId>
+			<executions>
+				<execution>
+					<id>run-mutation-tests</id>
+					<goals>
+						<goal>mutationCoverage</goal>
+					</goals>
+				</execution>
+			</executions>
+			<configuration>
+				<targetClasses>
+					<param>fr.damnardev.sample.pitest.common.*</param>
+				</targetClasses>
+				<targetTests>
+					<param>fr.damnardev.sample.pitest.common.*</param>
+				</targetTests>
+				<mutators>
+					<mutator>ALL</mutator>
+				</mutators>
+				<exportLineCoverage>true</exportLineCoverage>
+				<outputFormats>
+					<value>XML</value>
+				</outputFormats>
+			</configuration>
+		</plugin>
+	</plugins>
+</build>
+```
 
-Pour ajouter un nouveau module dans le projet, vous devez suivre les étapes ci-dessous.
+1. Adaptez **targetClasses** et **targetTests** aux packages de votre module.
+2. Ajustez les mutateurs selon vos besoins. Voir https://pitest.org/quickstart/mutators/ pour plus de détails.
 
-1. Créez le module avec **maven-template-internal-parent** comme parent.
-2. Déclarez le module dans le fichier **pom.xml** racine.
-3. Déclarez le module dans le bloc **dependencyManagement** du **maven-template-dependencies/pom.xml**.
-4. Déclarez le module comme dépendance dans le **maven-template-tests/pom.xml**.
-
-Si vous n'ajoutez pas le module dans le **maven-template-tests/pom.xml**, sa couverture ne sera pas agrégée.
+Le module **pitest-sample-tests** agrège les rapports PIT lors de la phase `verify`. Pour lancer uniquement les tests de mutation, exécutez `./mvnw test-compile org.pitest:pitest-maven:mutationCoverage -pl pitest-sample-common`.
 
 ## GitHub
 
