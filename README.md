@@ -1,14 +1,14 @@
 # Pitest Sample
 
-L'objectif de ce projet est de servir d'exemple sur la mise en place de pitest dans un projet. Pitest est un outil de tests de mutation pour Java, c'est-à-dire qu'il va modifier une portion de code et vérifier qu'au moins un test échoue.
+Ce projet Java sert d'exemple pour la mise en place de Pitest dans un projet. Il utilise Maven pour gérer le cycle de vie du projet et les dépendances. Pitest est un outil de tests de mutation pour Java : il modifie une portion de code et vérifie qu'au moins un test échoue.
 
 Si les tests n'échouent pas après la modification du code, cela signifie que le test n'est pas suffisamment robuste pour détecter cette modification.
 
 ## Structure du projet
 
-Ci-dessous, vous trouverez la structure des répertoires du projet :
+Ci-dessous, vous trouverez des informations sur les fichiers et répertoires importants du projet.
 
-Le fichier `root/pom.xml` liste les modules, configure SonarQube, JaCoCo et Pitest.
+Le fichier `pom.xml` racine liste les modules, configure SonarQube, JaCoCo et Pitest.
 
 Le module `pitest-sample-dependencies` centralise les versions des dépendances et des plugins.
 
@@ -24,7 +24,7 @@ Le module `pitest-sample-tests` sert à agréger les résultats des tests, de co
 
 Une fois le projet cloné, exécutez la commande `./mvnw clean verify` pour télécharger les dépendances, compiler le projet et lancer les vérifications.
 
-## Les commandes utiles (Maven)
+## Commandes utiles
 
 - `./mvnw clean` : supprime les fichiers générés
 - `./mvnw compile` : compile le projet
@@ -35,11 +35,11 @@ Une fois le projet cloné, exécutez la commande `./mvnw clean verify` pour tél
 - `./mvnw versions:display-dependency-updates` : liste les mises à jour disponibles des dépendances
 - `./mvnw versions:display-plugin-updates` : liste les mises à jour disponibles des plugins
 
-## Tests de mutation (PIT)
+## Tests de mutation
 
-Le projet utilise [PIT](https://pitest.org/) pour mesurer la qualité des tests par mutation. Les plugins `pitest-maven` et `pitest-junit5-plugin` sont configurés dans le `pom.xml` racine : leurs versions sont définies par les propriétés `pitest.maven.plugin.version` et `pitest.junit5.version`, et l'exécution `mutationCoverage` s'applique à tous les modules, dont `pitest-sample-common`.
+Le projet utilise [PIT](https://pitest.org/) pour mesurer la qualité des tests par mutation. Les plugins `pitest-maven` et `pitest-junit5-plugin` sont configurés dans le fichier `pom.xml` racine : leurs versions sont définies par les propriétés `pitest.maven.plugin.version` et `pitest.junit5.version`, et l'exécution `mutationCoverage` s'applique à tous les modules, dont `pitest-sample-common`.
 
-L'exécution `mutationCoverage` (id `run-mutation-tests`) est déclarée dans le `pom.xml` racine. Pour adapter la configuration d'un module, redéclarez le plugin dans le `pom.xml` de ce module avec les valeurs souhaitées :
+L'exécution `mutationCoverage` (id `run-mutation-tests`) est déclarée dans le fichier `pom.xml` racine. Pour adapter la configuration d'un module, redéclarez le plugin dans le fichier `pom.xml` de ce module avec les valeurs souhaitées :
 
 ```xml
 <build>
@@ -76,7 +76,7 @@ L'exécution `mutationCoverage` (id `run-mutation-tests`) est déclarée dans le
 ```
 
 1. Adaptez `targetClasses` et `targetTests` aux packages de votre module.
-2. Ajustez les mutateurs selon vos besoins. Voir https://pitest.org/quickstart/mutators/ pour plus de détails.
+2. Ajustez les mutateurs selon vos besoins. Voir [les mutateurs PIT](https://pitest.org/quickstart/mutators/) pour plus de détails.
 
 Le module `pitest-sample-tests` agrège les rapports PIT lors de la phase `verify`. Pour lancer uniquement les tests de mutation, exécutez `./mvnw test-compile org.pitest:pitest-maven:mutationCoverage -pl pitest-sample-common`.
 
